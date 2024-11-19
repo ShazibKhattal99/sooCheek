@@ -1,4 +1,4 @@
-/* eslint-disable prefer-destructuring */
+
 /**
 =========================================================
 * Material Dashboard 2 React - v2.2.0
