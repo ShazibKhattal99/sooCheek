@@ -1,0 +1,89 @@
+/* General Styling */
+.artist {
+  padding: 20px;
+  background-color: #f4f4f9;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.artist h1 {
+  font-size: 2rem;
+  text-align: center;
+  color: #333;
+}
+
+.filter, .search {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.filter label, .search label {
+  font-size: 1.2rem;
+  margin-right: 10px;
+}
+
+.filter select, .search input {
+  padding: 8px;
+  font-size: 1rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 200px;
+}
+
+/* Table Styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+  font-size: 1rem;
+}
+
+/* Linear Gradient for Table Header */
+th {
+  background-color:#9b59b6;
+  color: white;
+  font-weight: bold;
+}
+
+/* Alternating Row Colors */
+tr:nth-child(odd) td {
+  background-color: #f9f9f9;
+}
+
+tr:nth-child(even) td {
+  background-color: #e9ecef;
+}
+
+td {
+  color: #333;
+}
+
+/* No Skills Found Message */
+.no-skills-found {
+  margin-top: 20px;
+  text-align: center;
+  color: red;
+  font-size: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .artist {
+    padding: 15px;
+  }
+
+  table {
+    font-size: 0.9rem;
+  }
+
+  th, td {
+    padding: 8px;
+  }
+}

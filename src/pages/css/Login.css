@@ -1,0 +1,78 @@
+/* Login Page Container */
+.login {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* Move the form closer to the top */
+    height: 100vh;
+    background: linear-gradient(45deg, #9b59b6, #e74c3c);
+    color: white;
+    font-family: 'Arial', sans-serif;
+    padding-top: 50px; /* Add some padding from the top */
+  }
+  
+  /* Header */
+  header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+  }
+  
+  /* Form Styling */
+  .login-form {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    width: 300px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    color: #333;
+  }
+  
+  /* Form Group */
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 1rem;
+    font-weight: bold;
+  }
+  
+  .form-group input {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+  }
+  
+  /* Submit Button */
+  .login-button {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    background: linear-gradient(45deg, #9b59b6, #e74c3c);
+    color: white;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .login-button:hover {
+    background: linear-gradient(45deg, #e74c3c, #9b59b6);
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .login-form {
+      width: 90%;
+    }
+  }
+  
