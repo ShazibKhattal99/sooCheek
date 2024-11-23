@@ -3,16 +3,16 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
-  mode: "development", // Change to "production" for production builds
+  mode: "development", //
   entry: "./src/index.js", // Path to your main entry JS file
   output: {
-    path: path.resolve(__dirname, 'dist'), // Output directory
-    filename: '[name].[contenthash].js',  // Dynamic names to avoid collisions
-  },
-  
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name].[contenthash].js'  // Dynamic names to avoid collisions
+  }
+,  
   optimization: {
     splitChunks: {
-      chunks: "all", // Split code for optimization
+      chunks: "all",
     },
   },
 
@@ -22,18 +22,15 @@ module.exports = {
     port: 3000, // Port number
     hot: true, // Enable Hot Module Replacement (HMR)
     historyApiFallback: true, // For single-page applications, if using React Router
-    // You can add other dev server configurations here if needed
   },
 
   plugins: [
-    new CleanWebpackPlugin(), // Clean dist folder before each build
+    new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
-      template: './src/index.html', // Path to your HTML template
-      filename: 'index.html', // Output filename in dist folder
-      inject: 'body', // Inject JS at the end of the body
+      template: './src/index.html',
+      chunks: ['main', 'vendor'], // Ensure it includes both the main app and vendor chunk
     }),
   ],
-
   module: {
     rules: [
       {
@@ -50,15 +47,10 @@ module.exports = {
         test: /\.css$/, // This will apply to all .css files
         use: ['style-loader', 'css-loader'], // First apply css-loader, then style-loader
       },
-      // Optional: For Sass/SCSS files
-      // {
-      //   test: /\.scss$/,
-      //   use: ['style-loader', 'css-loader', 'sass-loader'],
-      // },
     ],
   },
 
   resolve: {
-    extensions: [".js", ".jsx", ".css"], // Resolve .js and .jsx extensions
+    extensions: [".js", ".jsx",".css"], // Resolve .js and .jsx extensions
   },
 };
