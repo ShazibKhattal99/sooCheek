@@ -10,6 +10,7 @@ module.exports = {
     filename: '[name].[contenthash].js'  // Dynamic names to avoid collisions
   }
 ,  
+
   optimization: {
     splitChunks: {
       chunks: "all",
@@ -34,14 +35,17 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.jsx?$/, // Targeting JS and JSX files
+        test: /\.jsx?$/, // This should include .js and .jsx files
         exclude: /node_modules/,
-        use: {
-          loader: "babel-loader",
-          options: {
-            presets: ["@babel/preset-env", "@babel/preset-react"],
-          },
+         use: {
+        loader: "babel-loader",
+        options: {
+          presets: [
+            "@babel/preset-env", 
+            "@babel/preset-react"
+          ],
         },
+      },
       },
       {
         test: /\.css$/, // This will apply to all .css files
