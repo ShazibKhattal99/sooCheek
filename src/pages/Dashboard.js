@@ -86,7 +86,7 @@ function Dashboard() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/backhouse/artistUser/artists"
+        "https://back-house-dwfv.vercel.app/backhouse/artistUser/artists"
       );
       const data = await response.json();
       console.log("Fetched artist data:", data); // Debugging log

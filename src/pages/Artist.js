@@ -13,7 +13,7 @@ function Artist() {
     const fetchArtists = async () => {
       try {
         const response = await fetch(
-          "http://localhost:5000/backhouse/artistUser/artists"
+          "https://back-house-dwfv.vercel.app/backhouse/artistUser/artists"
         );
         const data = await response.json();
         if (response.ok) {
