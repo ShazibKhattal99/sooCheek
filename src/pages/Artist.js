@@ -1,110 +1,165 @@
-import React, { useState } from 'react';
-import './css/Artist.css';
-
-const artistData = {
-  _id: "6721e3f9e4b059dc53db02c8",
-  email: "jayesh@test.com",
-  name: "Jayesh",
-  phoneNumber: "863826382628",
-  houseNo: "806",
-  buildingHouseName: "806",
-  street: "ABC",
-  city: "Mapusa",
-  pincode: "403510",
-  skills: ["Hair Styling", "Pedicure"],
-  pancard: "DGdw2632",
-  userId: "BCT4LUCKL2",
-};
+import React, { useState, useEffect } from "react";
+import "./css/Artist.css";
 
 function Artist() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterCity, setFilterCity] = useState('All');
+  const [artists, setArtists] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchId, setSearchId] = useState("");
+  const [filterCity, setFilterCity] = useState("All");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Handle search input change
-  const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value.toLowerCase());
-  };
+  useEffect(() => {
+    const fetchArtists = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:5000/backhouse/artistUser/artists"
+        );
+        const data = await response.json();
+        if (response.ok) {
+          setArtists(data.artists || []);
+        } else {
+          setError(data.message || "Failed to fetch artist data");
+        }
+      } catch (err) {
+        setError("An error occurred while fetching artist data");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchArtists();
+  }, []);
 
-  // Handle city filter change
-  const handleFilterChange = (event) => {
-    setFilterCity(event.target.value);
-  };
+  // Handle search inputs
+  const handleSearchChange = (e) => setSearchTerm(e.target.value.toLowerCase());
+  const handleSearchIdChange = (e) => setSearchId(e.target.value.toLowerCase());
+  const handleFilterChange = (e) => setFilterCity(e.target.value);
 
-  // Function to check if any skill matches the search term (case insensitive)
-  const matchesSearchTerm = (skill) => {
-    return skill.toLowerCase().includes(searchTerm);
-  };
+  // Filter artists based on City, Skills, and Artist ID
+  const filteredArtists = artists.filter((artist) => {
+    const matchesCity = filterCity === "All" || artist.city === filterCity;
+    const matchesSkill =
+      searchTerm === "" ||
+      (Array.isArray(artist.skills) &&
+        artist.skills.some(
+          (category) =>
+            Array.isArray(category.skills) &&
+            category.skills.some((skill) =>
+              skill.toLowerCase().includes(searchTerm)
+            )
+        ));
+    const matchesId =
+      searchId === "" ||
+      (artist.artistId && artist.artistId.toLowerCase().includes(searchId));
 
-  // Function to display artist data if city and search match
-  const displayData = filterCity === 'All' || artistData.city === filterCity ? artistData : null;
-
-  // Filter skills based on the search term (for display outside table)
-  const filteredSkills = artistData.skills.filter(matchesSearchTerm);
-  const noSkillsFound = filteredSkills.length === 0 && searchTerm !== ''; // If no skills found and search term is not empty
+    return matchesCity && matchesSkill && matchesId;
+  });
 
   return (
     <div className="artist">
       <h1>Artist Details</h1>
-  
-      {/* City Filter Dropdown */}
-      <div className="filter">
-        <label htmlFor="cityFilter">Filter by City:</label>
-        <select id="cityFilter" value={filterCity} onChange={handleFilterChange}>
-          <option value="All">All</option>
-          <option value="Mumbai">Mumbai</option>
-          {/* Add other cities here if needed */}
-        </select>
-      </div>
-  
-      {/* Search Input for skills */}
-      <div className="search">
-        <label htmlFor="search">Search Skills:</label>
-        <input
-          id="search"
-          type="text"
-          value={searchTerm}
-          onChange={handleSearchChange}
-          placeholder="Search skills"
-        />
-      </div>
-  
-      {/* Conditional Rendering */}
-      {displayData && filteredSkills.length > 0 ? (
-        <table>
-          <thead>
-            <tr>
-              <th>Email</th>
-              <th>Name</th>
-              <th>Phone Number</th>
-              <th>Address</th>
-              <th>Skills</th>
-              <th>Pancard</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>{artistData.email}</td>
-              <td>{artistData.name}</td>
-              <td>{artistData.phoneNumber}</td>
-              <td>
-                {artistData.houseNo}, {artistData.buildingHouseName},{" "}
-                {artistData.street}, {artistData.city}, {artistData.pincode}
-              </td>
-              <td>{artistData.skills.join(", ")}</td>
-              <td>{artistData.pancard}</td>
-            </tr>
-          </tbody>
-        </table>
-      ) : noSkillsFound ? (
-        <div className="no-skills-found">
-          <p>No skills match the search term.</p>
-        </div>
-      ) : (
-        <p>No artist found for the selected city.</p>
+
+      {loading && <p>Loading artist data...</p>}
+      {error && <p className="error">{error}</p>}
+
+      {!loading && !error && (
+        <>
+          <div className="filters">
+            <div>
+              <label htmlFor="cityFilter">City:</label>
+              <select
+                id="cityFilter"
+                value={filterCity}
+                onChange={handleFilterChange}
+              >
+                <option value="All">All</option>
+                {[...new Set(artists.map((artist) => artist.city))].map(
+                  (city) => (
+                    <option key={city} value={city}>
+                      {city}
+                    </option>
+                  )
+                )}
+              </select>
+            </div>
+
+            <div>
+              <label>Search Skills:</label>
+              <input
+                type="text"
+                placeholder="Enter skills"
+                value={searchTerm}
+                onChange={handleSearchChange}
+              />
+            </div>
+
+            <div>
+              <label>Artist ID:</label>
+              <input
+                type="text"
+                placeholder="Enter Artist ID"
+                value={searchId}
+                onChange={handleSearchIdChange}
+              />
+            </div>
+          </div>
+
+          {filteredArtists.length > 0 ? (
+            <table>
+              <thead>
+                <tr>
+                  <th>Email</th>
+                  <th>Artist ID</th>
+                  <th>Name</th>
+                  <th>City</th>
+                  <th>Phone Number</th>
+                  <th>Address</th>
+                  <th>Skills</th>
+                  <th>Pancard</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredArtists.map((artist) => (
+                  <tr key={artist._id}>
+                    <td>{artist.email || "N/A"}</td>
+                    <td>{artist.artistId || "N/A"}</td>
+                    <td>{artist.name || "N/A"}</td>
+                    <td>{artist.city || "N/A"}</td>
+                    <td>
+                      {artist.phoneNumber ? `+91 ${artist.phoneNumber}` : "N/A"}
+                    </td>
+                    <td>
+                      {[
+                        artist.houseNo,
+                        artist.buildingHouseName,
+                        artist.street,
+                        artist.city,
+                        artist.pincode,
+                      ]
+                        .filter(Boolean)
+                        .join(", ")}
+                    </td>
+                    <td>
+                      {Array.isArray(artist.skills)
+                        ? artist.skills
+                            .map((category) =>
+                              category.skills ? category.skills.join(", ") : ""
+                            )
+                            .join(", ")
+                        : "N/A"}
+                    </td>
+                    <td>{artist.pancard || "N/A"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p>No artists match the current filters.</p>
+          )}
+        </>
       )}
     </div>
   );
-  
 }
 
 export default Artist;

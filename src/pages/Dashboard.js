@@ -21,7 +21,7 @@ import {
 } from "recharts";
 import "./css/Dashboard.css";
 
-// Sample Data
+// Sample data for pie, bar, line, and radar charts (temporary placeholder)
 const orderData = [
   { name: "Pending", value: 100 },
   { name: "Completed", value: 300 },
@@ -61,22 +61,124 @@ const radarData = [
   { kpi: "Customers", value: 85 },
 ];
 
-const stats = {
-  artists: 50,
-  revenueThisMonth: 23000,
-  completedOrders: 120,
-  pendingOrders: 20,
-  activeOrders: 30,
-};
-
 function Dashboard() {
+  const [stats, setStats] = useState({
+    artists: 0,
+    revenueThisMonth: 0,
+    completedOrders: 0,
+    pendingOrders: 0,
+    activeOrders: 0,
+  });
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Cache for artist and order data
+  const [cachedArtistData, setCachedArtistData] = useState(null);
+  const [cachedOrderData, setCachedOrderData] = useState(null);
+
+  // Function to fetch artist data
+  const fetchArtists = async () => {
+    if (cachedArtistData) {
+      console.log("Using cached artist data:", cachedArtistData);
+      return cachedArtistData; // Return cached data if available
+    }
+
+    try {
+      const response = await fetch(
+        "http://localhost:5000/backhouse/artistUser/artists"
+      );
+      const data = await response.json();
+      console.log("Fetched artist data:", data); // Debugging log
+      setCachedArtistData(data);
+      return data;
+    } catch (err) {
+      console.error("Failed to fetch artist data:", err);
+      setError("Failed to fetch artist data");
+      throw err;
+    }
+  };
+
+  // Function to fetch order data
+  const fetchOrders = async () => {
+    if (cachedOrderData) {
+      return cachedOrderData; // Return cached data if available
+    }
+
+    try {
+      const response = await fetch(
+        "https://back-house-dwfv.vercel.app/order/allOrders",
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("respoonse", response);
+      const data = await response.json();
+      setCachedOrderData(data);
+      return data;
+    } catch (err) {
+      setError("Failed to fetch order data");
+      throw err;
+    }
+  };
+
+  // UseEffect to fetch both artist and order data when the component mounts
   useEffect(() => {
-    // Example: Fetch your data from an API if needed
-  }, []);
+    const loadData = async () => {
+      try {
+        // Fetch artists and orders data in parallel
+        const [artistData, orderData] = await Promise.all([
+          fetchArtists(),
+          fetchOrders(),
+        ]);
+  
+        console.log("Fetched artist data:", artistData); // Debugging log
+        console.log("Fetched order data:", orderData); // Debugging log
+  
+        // Ensure artistData is an array
+        const artistCount = Array.isArray(artistData) ? artistData.length : 0;
+  
+        // Filter and calculate statistics based on the fetched order data
+        const completedOrders = orderData.filter(
+          (order) => order.orderStatus === "Completed"
+        ).length;
+        const pendingOrders = orderData.filter(
+          (order) => order.orderStatus === "Pending"
+        ).length;
+        const activeOrders = orderData.filter(
+          (order) => order.orderStatus === "In Progress"
+        ).length;
+  
+        // Calculate total revenue for completed orders only
+        const totalRevenue = orderData
+          .filter((order) => order.orderStatus === "Completed")
+          .reduce((sum, order) => sum + order.totalAmount, 0);
+  
+        setStats({
+          artists: artistCount, // Use checked value
+          revenueThisMonth: totalRevenue,
+          completedOrders,
+          pendingOrders,
+          activeOrders,
+        });
+  
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setLoading(false);
+      }
+    };
+  
+    loadData();
+  }, [cachedArtistData, cachedOrderData]); // Depend on cached data changes
+  
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="dashboard">
-
       {/* Stats Section */}
       <div className="stats-section">
         <div className="stat-card">
@@ -97,7 +199,7 @@ function Dashboard() {
         </div>
         <div className="stat-card revenue">
           <h3>Revenue This Month</h3>
-          <p>${stats.revenueThisMonth}</p>
+          <p>₹{stats.revenueThisMonth}</p>
         </div>
       </div>
 
@@ -117,7 +219,10 @@ function Dashboard() {
                 label
               >
                 {orderData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={["#0088FE", "#00C49F", "#FFBB28"][index]} />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={["#0088FE", "#00C49F", "#FFBB28"][index]}
+                  />
                 ))}
               </Pie>
               <Legend />
@@ -151,7 +256,12 @@ function Dashboard() {
               <XAxis dataKey="month" />
               <YAxis />
               <Tooltip />
-              <Line type="monotone" dataKey="revenue" stroke="#8884d8" strokeWidth={2} />
+              <Line
+                type="monotone"
+                dataKey="revenue"
+                stroke="#8884d8"
+                strokeWidth={2}
+              />
             </LineChart>
           </ResponsiveContainer>
         </div>

@@ -5,20 +5,48 @@ import Artist from './pages/Artist';
 import Order from './pages/Order';
 import Navbar from './components/Navbar';
 import Login from './pages/Login';
+import { AuthProvider } from './AuthContext';
+import PrivateRoute from './PrivateRoute';
 
 function App() {
   return (
-    <Router>
-      <Navbar />
-      <div className="App">
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/artist" element={<Artist />} />
-          <Route path="/order" element={<Order />} />
-          <Route path="/login" element={<Login />} />
-        </Routes>
-      </div>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Navbar />
+        <div className="App">
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/login" element={<Login />} />
+
+            {/* Protected Routes */}
+            <Route
+              path="/"
+              element={
+                <PrivateRoute>
+                  <Dashboard />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/artist"
+              element={
+                <PrivateRoute>
+                  <Artist />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/order"
+              element={
+                <PrivateRoute>
+                  <Order />
+                </PrivateRoute>
+              }
+            />
+          </Routes>
+        </div>
+      </Router>
+    </AuthProvider>
   );
 }
 

@@ -1,150 +1,8 @@
-import React, { useState } from 'react';
-import './css/Order.css';
-
-// Sample order data with the new fields
-const orderData = [
-    {
-      _id: "672a67eb3d953b8093a3c1bc",
-      transactionId: "TXN-1730832363818",
-      name: "D",
-      phoneNumber: "d",
-      address: "d",
-      date: "2024-11-23",
-      time: "3:15 PM",
-      longitude: 77.6994816,
-      latitude: 12.9728512,
-      cartItems: [
-        { serviceId: "Ade3", title: "Hair Dye", price: 221 },
-        { serviceId: "B32de", title: "Coloring Techniques", price: 23 },
-      ],
-      orderPlacedDate: "2024-11-06",
-      orderPlacedTime: "00:16",
-      userId: "dummyUser123",
-      totalAmount: 244,
-      orderStatus: "Pending",
-      paymentStatus: "Unpaid",
-      artistAssigned: false,  // New field
-      artistId: "",  // New field to store artistId if not assigned
-    },
-    {
-      _id: "672a67eb3d953b8093a3c1bd",
-      transactionId: "TXN-1730832363820",
-      name: "A",
-      phoneNumber: "a",
-      address: "a",
-      date: "2024-11-23",
-      time: "4:00 PM",
-      longitude: 77.6794816,
-      latitude: 12.9628512,
-      cartItems: [
-        { serviceId: "C12", title: "Nail Art", price: 120 },
-        { serviceId: "D34", title: "Manicure", price: 45 },
-      ],
-      orderPlacedDate: "2024-11-07",
-      orderPlacedTime: "02:10",
-      userId: "dummyUser124",
-      totalAmount: 165,
-      orderStatus: "Completed",
-      paymentStatus: "Paid",
-      artistAssigned: true,  // New field set to true
-      artistId: "Artist124",  // Artist already assigned
-    },
-    {
-      _id: "672a67eb3d953b8093a3c1be",
-      transactionId: "TXN-1730832363845",
-      name: "B",
-      phoneNumber: "b",
-      address: "b",
-      date: "2024-11-23",
-      time: "4:30 PM",
-      longitude: 77.6894816,
-      latitude: 12.9528512,
-      cartItems: [
-        { serviceId: "E56", title: "Facial Treatment", price: 350 },
-        { serviceId: "F78", title: "Eyebrow Shaping", price: 80 },
-      ],
-      orderPlacedDate: "2024-11-08",
-      orderPlacedTime: "03:45",
-      userId: "dummyUser125",
-      totalAmount: 430,
-      orderStatus: "Pending",
-      paymentStatus: "Unpaid",
-      artistAssigned: false,  // Artist not yet assigned
-      artistId: "",  // Artist not assigned
-    },
-    {
-      _id: "672a67eb3d953b8093a3c1bf",
-      transactionId: "TXN-1730832363850",
-      name: "C",
-      phoneNumber: "c",
-      address: "c",
-      date: "2024-11-23",
-      time: "5:00 PM",
-      longitude: 77.6999816,
-      latitude: 12.9928512,
-      cartItems: [
-        { serviceId: "G90", title: "Haircut", price: 150 },
-        { serviceId: "H12", title: "Shampoo", price: 30 },
-      ],
-      orderPlacedDate: "2024-11-09",
-      orderPlacedTime: "05:10",
-      userId: "dummyUser126",
-      totalAmount: 180,
-      orderStatus: "Completed",
-      paymentStatus: "Paid",
-      artistAssigned: true,  // Artist already assigned
-      artistId: "Artist126",  // Artist already assigned
-    },
-    {
-      _id: "672a67eb3d953b8093a3c1c0",
-      transactionId: "TXN-1730832363870",
-      name: "E",
-      phoneNumber: "e",
-      address: "e",
-      date: "2024-11-23",
-      time: "5:30 PM",
-      longitude: 77.6694816,
-      latitude: 12.9228512,
-      cartItems: [
-        { serviceId: "I34", title: "Pedicure", price: 200 },
-        { serviceId: "J56", title: "Massage", price: 250 },
-      ],
-      orderPlacedDate: "2024-11-10",
-      orderPlacedTime: "06:30",
-      userId: "dummyUser127",
-      totalAmount: 450,
-      orderStatus: "Pending",
-      paymentStatus: "Unpaid",
-      artistAssigned: false,  // Artist not assigned
-      artistId: "",  // Artist not assigned
-    },
-    {
-      _id: "672a67eb3d953b8093a3c1c1",
-      transactionId: "TXN-1730832363885",
-      name: "F",
-      phoneNumber: "f",
-      address: "f",
-      date: "2024-11-23",
-      time: "6:00 PM",
-      longitude: 77.6594816,
-      latitude: 12.9128512,
-      cartItems: [
-        { serviceId: "K78", title: "Haircut", price: 180 },
-        { serviceId: "L90", title: "Shave", price: 50 },
-      ],
-      orderPlacedDate: "2024-11-11",
-      orderPlacedTime: "07:00",
-      userId: "dummyUser128",
-      totalAmount: 230,
-      orderStatus: "Completed",
-      paymentStatus: "Paid",
-      artistAssigned: true,  // Artist already assigned
-      artistId: "Artist128",  // Artist already assigned
-    },
-  ];
-  
+import React, { useState, useEffect } from "react";
+import "./css/Order.css";
 
 function Order() {
+  const [orders, setOrders] = useState([]); // State to store the fetched orders
   const [expandedOrderId, setExpandedOrderId] = useState(null); // Track the expanded order
   const [filters, setFilters] = useState({
     orderPlacedDate: "",
@@ -152,6 +10,38 @@ function Order() {
     paymentStatus: "",
   });
   const [artistIdInput, setArtistIdInput] = useState(""); // State for the artistId input
+  const [loading, setLoading] = useState(true); // State for loading
+  const [error, setError] = useState(null); // State for handling errors
+
+  // Fetch data from API on component mount
+  useEffect(() => {
+    const fetchOrders = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(
+          "https://back-house-dwfv.vercel.app/backhouse/order/allOrders",
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setOrders(data);
+        setLoading(false);
+      } catch (error) {
+        setError(error.message);
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, []);
 
   const handleFilterChange = (e) => {
     setFilters({
@@ -161,27 +51,90 @@ function Order() {
   };
 
   const toggleExpand = (orderId) => {
-    // If the same card is clicked, toggle collapse, otherwise expand the clicked one
-    setExpandedOrderId((prevOrderId) => (prevOrderId === orderId ? null : orderId));
+    setExpandedOrderId((prevOrderId) =>
+      prevOrderId === orderId ? null : orderId
+    );
   };
 
   const handleArtistIdChange = (e) => {
     setArtistIdInput(e.target.value); // Update the artistId input value
   };
 
+  // Reusable function to update orders
+  const updateOrder = async (transactionId, updateData) => {
+    try {
+      const response = await fetch(
+        `https://back-house-dwfv.vercel.app/backhouse/order/orders/${transactionId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updateData),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+
+      const updatedOrder = await response.json();
+
+      // Update the local state with the updated order
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order.transactionId === transactionId ? updatedOrder : order
+        )
+      );
+
+      alert("Order updated successfully!");
+    } catch (error) {
+      console.error("Failed to update order:", error);
+      alert("Failed to update order. Please try again.");
+    }
+  };
+
+  const assignArtist = (transactionId) => {
+    if (!artistIdInput.trim()) {
+      alert("Please enter a valid Artist ID.");
+      return;
+    }
+
+    const updateData = {
+      artistAssigned: true,
+      artistId: artistIdInput, // Use the artistId input state
+      orderStatus: 'In Progress',
+    };
+
+    updateOrder(transactionId, updateData); // Call update API
+    setArtistIdInput(""); // Clear input field after assigning
+  };
+
   // Apply filters to the order data
-  const filteredOrders = orderData.filter((order) => {
+  const filteredOrders = orders.filter((order) => {
     return (
-      (filters.orderPlacedDate === "" || order.orderPlacedDate.includes(filters.orderPlacedDate)) &&
-      (filters.orderStatus === "" || order.orderStatus.includes(filters.orderStatus)) &&
-      (filters.paymentStatus === "" || order.paymentStatus.includes(filters.paymentStatus))
+      (filters.orderPlacedDate === "" ||
+        order.orderPlacedDate.includes(filters.orderPlacedDate)) &&
+      (filters.orderStatus === "" ||
+        order.orderStatus.includes(filters.orderStatus)) &&
+      (filters.paymentStatus === "" ||
+        order.paymentStatus.includes(filters.paymentStatus))
     );
   });
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div className="order">
       <h1>Order Details</h1>
 
+      {/* Filter Section */}
       {/* Filter Section */}
       <div className="order-filters">
         <input
@@ -197,6 +150,8 @@ function Order() {
         >
           <option value="">Order Status</option>
           <option value="Pending">Pending</option>
+          <option value="In Progress">In Progress</option>{" "}
+          {/* Added In Progress */}
           <option value="Completed">Completed</option>
         </select>
         <select
@@ -213,48 +168,82 @@ function Order() {
       {/* Order Cards */}
       <div className="order-cards">
         {filteredOrders.map((order) => (
-          <div key={order._id} className="order-card">
-            <h2 className="expandable-card-header" onClick={() => toggleExpand(order._id)}>
+          <div key={order.transactionId} className="order-card">
+            <h2
+              className="expandable-card-header"
+              onClick={() => toggleExpand(order.transactionId)}
+            >
               {/* Icon for expanding or minimizing */}
               <span className="expand-collapse-icon">
-                {expandedOrderId === order._id ? '-' : '+'}
+                {expandedOrderId === order.transactionId ? "-" : "+"}
               </span>
-              Transaction ID: <span className="transaction-id">{order.transactionId}</span>
+              Transaction ID:{" "}
+              <span className="transaction-id">{order.transactionId}</span>
             </h2>
 
+            {/* Order Details Summary */}
             <div className="order-summary">
-              <p><strong>Order Placed Date:</strong> {order.orderPlacedDate}</p>
-              <p><strong>Order Status:</strong> {order.orderStatus}</p>
-              <p className="small-text"><strong>Transaction ID:</strong> {order.transactionId}</p>
+              <p>
+                <strong>Order Placed Date:</strong> {order.orderPlacedDate}
+              </p>
+              <p>
+                <strong>Order Placed Time:</strong> {order.orderPlacedTime}
+              </p>
+              <p>
+                <strong>Order Status:</strong> {order.orderStatus}
+              </p>
+              <p>
+                <strong>Payment Status:</strong> {order.paymentStatus}
+              </p>
+              <p>
+                <strong>Phone Number:</strong> {order.phoneNumber}
+              </p>
+              <p>
+                <strong>Name:</strong> {order.name}
+              </p>
+              <p>
+                <strong>Address:</strong> {order.address}
+              </p>
             </div>
 
             {/* Expanded details */}
-            {expandedOrderId === order._id && (
+            {expandedOrderId === order.transactionId && (
               <div className="order-details">
                 <div className="cart-items">
                   <h3>Cart Items:</h3>
                   <ul>
                     {order.cartItems.map((item, index) => (
-                      <li key={index}>{item.title} - ₹{item.price}</li>
+                      <li key={index}>
+                        {item.title} - ₹{item.price} x {item.quantity} = ₹
+                        {item.totalPrice}
+                      </li>
                     ))}
                   </ul>
                 </div>
-                <p><strong>Total Amount:</strong> <span className="highlighted">₹{order.totalAmount}</span></p>
-                <p><strong>Payment Status:</strong> {order.paymentStatus}</p>
+                <p>
+                  <strong>Total Amount:</strong>{" "}
+                  <span className="highlighted">₹{order.totalAmount}</span>
+                </p>
 
                 {/* Artist Assignment Section */}
                 {order.artistAssigned ? (
-                  <p><strong>Artist Assigned:</strong> {order.artistId}</p>
+                  <p>
+                    <strong>Artist Assigned:</strong> {order.artistId}
+                  </p>
                 ) : (
                   <div className="input-container">
-                    <p><strong>Artist not assigned yet.</strong></p>
+                    <p>
+                      <strong>Artist not assigned yet.</strong>
+                    </p>
                     <input
                       type="text"
                       placeholder="Enter Artist ID"
                       value={artistIdInput}
                       onChange={handleArtistIdChange}
                     />
-                    <button onClick={() => console.log("Assigning Artist:", artistIdInput)}>Assign</button>
+                    <button onClick={() => assignArtist(order.transactionId)}>
+                      Assign
+                    </button>
                   </div>
                 )}
               </div>
