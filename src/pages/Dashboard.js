@@ -107,7 +107,8 @@ function Dashboard() {
 
     try {
       const response = await fetch(
-        "https://back-house-dwfv.vercel.app/order/allOrders",
+        "https://back-house-dwfv.vercel.app/backhouse/order/allOrders",
+        
         {
           headers: {
             "Content-Type": "application/json",

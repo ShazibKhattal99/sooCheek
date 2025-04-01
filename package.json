@@ -3,11 +3,10 @@
   "version": "1.0.0",
   "description": "soo cheek admin",
   "private": true,
-  "homepage": "https://github.com/ShazibKhattal99/sooCheek",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack serve --open",
+    "start": "react-scripts start",
     "build": "react-scripts build",
     "predeploy": "npm run build",
     "deploy": "git subtree push --prefix build origin master"
@@ -22,7 +21,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.0.0",
-    "react-scripts": "^4.0.0",
+    "react-scripts": "^5.0.1",
     "recharts": "^2.13.3",
     "styled-components": "^6.1.13"
   },
@@ -34,8 +33,18 @@
     "css-loader": "^7.1.2",
     "gh-pages": "^6.3.0",
     "html-webpack-plugin": "^5.6.3",
-    "style-loader": "^4.0.0",
-    "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^5.1.0"
+    "style-loader": "^4.0.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
